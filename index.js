@@ -35,3 +35,5 @@ const series = (commands, callback) => {
     };
     executeNext();
 };
+
+module.exports = series;
