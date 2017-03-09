@@ -10,6 +10,7 @@ const createError = (command, code) => {
 }
 
 const exec = (command, callback) => {
+    console.info('Executing ' + command);
     const parts = command.split(/\s+/g);
     const process = spawn(parts[0], parts.slice(1), {stdio: 'inherit'});
     process.on('exit', function(code){

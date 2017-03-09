@@ -1,6 +1,6 @@
 {
   "name": "node-seq-exec",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Execute shell commands in sequence in node",
   "main": "index.js",
   "scripts": {
