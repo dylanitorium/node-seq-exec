@@ -2,39 +2,51 @@ const spawn = require('child_process').spawn;
 
 const createError = (command, code) => {
     if (code) {
-        const error = new Error('command "'+ command +'" exited with wrong status code "'+ code +'"');
+        const error = new Error(`command ${command} exited with wrong status code ${code}`);
         error.code = code;
         error.command = command;
         return error;
     }
 }
 
-const exec = (command, callback) => {
-    console.info('Executing ' + command);
-    const parts = command.split(/\s+/g);
-    const process = spawn(parts[0], parts.slice(1), {stdio: 'inherit'});
-    process.on('exit', function(code){
-        if (callback) {
-            callback(createError(command, code));
-        }
-    });
+const extractProcessArgs = parts => ([
+  parts[0],
+  parts.slice(1),
+  {
+    stdio: 'inherit'
+  },
+]);
+
+const exec = (command, callback, debug) => {
+  if (debug) {
+    console.log(`Executing ${command}`);
+  }
+
+  try {
+    spawn(...extractProcessArgs(command.split(/\s+/g))).on('exit', code => (
+      callback(createError(command, code))
+    ))
+  }
+  catch(exception) {
+    callback(exception);
+  }
 };
 
-const series = (commands, callback) => {
-    const executeNext = () => {
-        exec(commands.shift(), function(error){
+const handleExit = (callback, promise, error) => ((callback) ? callback(error) : promise(error));
+
+const series = (commands, callback, debug) => (
+  new Promise((resolve, reject) => {
+    const next = () => {
+        exec(commands.shift(), (error) => {
             if (error) {
-                callback(error);
+                return handleExit(callback, reject, error);
             } else {
-                if (commands.length) {
-                    executeNext();
-                } else {
-                    callback(null);
-                }
+                return commands.length ? next() : handleExit(callback, resolve);
             }
-        });
+        }, true);
     };
-    executeNext();
-};
+    next();
+  })
+);
 
 module.exports = series;
