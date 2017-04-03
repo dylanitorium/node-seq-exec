@@ -8,6 +8,8 @@ A small package which assists with executing shell commands in sequence in node.
 
 ## usage
 
+with callback
+
 ```
 const seriesExec = require('node-seq-exec');
 
@@ -19,4 +21,15 @@ seriesExec([
     console.error(error);
   }
 });
+```
+
+with promise
+
+```
+const seriesExec = require('node-seq-exec');
+
+seriesExec([
+  'command 1',
+  'command 2',
+]).catch(console.error);
 ```
