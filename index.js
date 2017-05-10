@@ -23,7 +23,7 @@ const exec = (command, callback, debug) => {
   }
 
   try {
-    spawn(...extractProcessArgs(command.split(/\s+/g))).on('exit', code => (
+    spawn(...extractProcessArgs(command.split(/[^\s"']+|"([^"]*)"|'([^']*)'/g))).on('exit', code => (
       callback(createError(command, code))
     ))
   }
